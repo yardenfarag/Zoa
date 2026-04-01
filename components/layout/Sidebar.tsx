@@ -3,23 +3,20 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
-import {
-  Bug,
-  Worm,
-  Leaf,
-  Droplets,
-  ShieldAlert,
-  PanelLeftClose,
-  PanelLeftOpen,
-} from "lucide-react"
+import { House, Worm, PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import { BacteriaIcon } from "@/components/icons/BacteriaIcon"
+import { MushroomIcon } from "@/components/icons/MushroomIcon"
+import { AmoebaIcon } from "@/components/icons/AmoebaIcon"
+import { VirusIcon } from "@/components/icons/VirusIcon"
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
-  { label: "Bacteria", href: "/bacteria", icon: Bug },
+  { label: "Home", href: "/", icon: House },
+  { label: "Bacteria", href: "/bacteria", icon: BacteriaIcon },
   { label: "Parasites", href: "/parasites", icon: Worm },
-  { label: "Fungus", href: "/fungus", icon: Leaf },
-  { label: "Amoebas", href: "/amoebas", icon: Droplets },
-  { label: "Viruses", href: "/viruses", icon: ShieldAlert },
+  { label: "Fungus", href: "/fungus", icon: MushroomIcon },
+  { label: "Amoebas", href: "/amoebas", icon: AmoebaIcon },
+  { label: "Viruses", href: "/viruses", icon: VirusIcon },
 ] as const
 
 interface SidebarProps {
@@ -38,7 +35,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     >
       <nav className="flex-1 space-y-1 px-2 py-4">
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-          const active = pathname.startsWith(href)
+          const active =
+            href === "/" ? pathname === "/" : pathname.startsWith(href)
           return (
             <Link
               key={href}
@@ -46,7 +44,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               className={cn(
                 "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 active
-                  ? "border-l-2 border-gold bg-scarlet text-white"
+                  ? "border-l-2 border-gold bg-scarlet/50 text-white"
                   : "text-parchment/70 hover:bg-white/5 hover:text-parchment",
               )}
             >

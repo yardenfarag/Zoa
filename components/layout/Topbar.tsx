@@ -6,7 +6,9 @@ export function Topbar() {
   return (
     <header className="glass fixed inset-x-0 top-0 z-50 flex h-14 items-center border-b border-gold/10 px-4">
       <div className="flex w-60 shrink-0 items-center">
-        <h1 className="font-heading text-xl tracking-wide text-gold">Zoa</h1>
+        <h1 className="font-heading text-2xl tracking-[0.14em] text-gold">
+          Z<span className="zoa-bacteria-o">O</span>A
+        </h1>
       </div>
 
       <div className="mx-auto w-full max-w-md">

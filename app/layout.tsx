@@ -1,10 +1,11 @@
 import type { Metadata } from "next"
-import { Roboto, Manrope } from "next/font/google"
+import { Cinzel_Decorative, Manrope } from "next/font/google"
 import { Shell } from "@/components/layout/Shell"
 import "./globals.css"
 
-const roboto = Roboto({
+const cinzelDecorative = Cinzel_Decorative({
   subsets: ["latin"],
+  weight: ["700"],
   variable: "--font-heading",
 })
 
@@ -26,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${roboto.variable} ${manrope.variable} dark h-full antialiased`}
+      className={`${cinzelDecorative.variable} ${manrope.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Shell>{children}</Shell>
