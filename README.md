@@ -1,74 +1,152 @@
-# ZOA
+# Zoa
 
-Microbiological archive interface built with Next.js, React, Tailwind CSS v4, and Framer Motion.
+**Zoa** is a dark, archive-style encyclopedia of microorganisms. Browse and explore bacteria, parasites, fungi, amoebas, and viruses — each with images, habitat info, size, and capabilities pulled from a Postgres-backed NestJS API.
 
-## Current status
+## Stack
 
-The project currently ships a polished home experience and shared shell layout:
+| Layer | Technology |
+| --- | --- |
+| Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, Framer Motion |
+| Backend | NestJS 11, TypeORM, PostgreSQL 16 |
+| Media | Cloudflare R2 (optional) — falls back to Wikimedia Commons URLs |
+| Production data | Supabase (optional) |
+| Infrastructure | Docker Compose (Postgres only) |
 
-- Fixed `Topbar` with branded title and archive search input UI
-- Animated, collapsible left `Sidebar` with category navigation
-- Full-page `Shell` layout that wraps app routes
-- Interactive `PetriDish` hero on the home route with:
-  - Floating microbe field
-  - Cursor-tracked magnifying lens
-  - Spring-smoothed lens motion and zoomed overlay
-- Custom icon components for `Bacteria`, `Amoeba`, `Mushroom`, and `Virus`
-- Dark archive theme with scarlet/gold/parchment palette and glass styling
+## Monorepo layout
 
-## Tech stack
-
-- `Next.js 16` (App Router)
-- `React 19` + `TypeScript`
-- `Tailwind CSS 4`
-- `Framer Motion`
-- `lucide-react`
-- `shadcn` utilities and styling primitives
-
-## Project structure
-
-```text
-app/
-  layout.tsx        # Global layout + fonts + Shell wrapper
-  page.tsx          # Home route with PetriDish
-  globals.css       # Theme tokens and custom styles
-
-components/
-  home/PetriDish.tsx
-  layout/Shell.tsx
-  layout/Sidebar.tsx
-  layout/Topbar.tsx
-  icons/
-    BacteriaIcon.tsx
-    AmoebaIcon.tsx
-    MushroomIcon.tsx
-    VirusIcon.tsx
 ```
+zoa/
+├── frontend/        # Next.js app
+├── backend/         # NestJS API
+├── docs/            # Plans and SQL schema
+│   ├── plans/       # Feature planning docs
+│   └── supabase/    # microbes.sql for hosted DB
+└── docker-compose.yml
+```
+
+## Pages
+
+| Route | Description |
+| --- | --- |
+| `/` | Home — interactive Petri dish hero |
+| `/[type]` | Category archive — card grid for bacteria, parasites, fungus, amoebas, or viruses |
+| `/[type]/[id]` | Microbe detail — image gallery, habitat, capabilities, description |
 
 ## Getting started
 
-1. Install dependencies:
+### 1. Install
+
+From the repository root (installs all workspaces):
 
 ```bash
 npm install
 ```
 
-2. Start the dev server:
+### 2. Configure environment
+
+Copy the example env files and fill in your values:
+
+```bash
+cp frontend/.env.example frontend/.env.local
+cp backend/.env.example backend/.env
+```
+
+**`frontend/.env.local`**
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+
+# Optional — only needed if using Supabase for production data
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
+
+**`backend/.env`**
+
+```env
+DB_HOST=localhost
+DB_PORT=5556
+DB_USERNAME=zoa
+DB_PASSWORD=zoa
+DB_NAME=zoa_db
+TYPEORM_SYNC=true
+
+# Optional — Cloudflare R2 for image hosting
+R2_ENDPOINT=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET=
+R2_REGION=auto
+R2_PUBLIC_BASE_URL=
+```
+
+### 3. Start Postgres
+
+```bash
+docker compose up -d
+```
+
+This starts a Postgres 16 instance on port **5556**.
+
+### 4. Run the API
+
+```bash
+npm run dev:api
+```
+
+The API starts at `http://localhost:3001`.
+
+### 5. Seed demo data
+
+On first run, seed the database with 10 sample microbes:
+
+```bash
+npm run seed:api
+```
+
+### 6. Attach images
+
+Fetch thumbnails from Wikimedia Commons and store them (uploads to R2 if configured, otherwise stores the Commons URL directly):
+
+```bash
+npm run sync-images:api
+```
+
+To replace existing image URLs, use the `--force` variant:
+
+```bash
+npm run sync-images:api:force
+```
+
+### 7. Start the frontend
 
 ```bash
 npm run dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000).
 
-## Available scripts
+## Scripts (root)
 
-- `npm run dev` - start development server
-- `npm run build` - create production build
-- `npm run start` - run production server
-- `npm run lint` - run ESLint
+| Script | What it does |
+| --- | --- |
+| `npm run dev` | Start the Next.js dev server |
+| `npm run dev:api` | Start the NestJS dev server |
+| `npm run seed:api` | Seed the database with demo microbes |
+| `npm run sync-images:api` | Attach Wikimedia/R2 image URLs to seeded microbes |
+| `npm run sync-images:api:force` | Same, but replaces existing URLs |
+| `npm run build` | Build the frontend |
+| `npm run build:api` | Build the backend |
 
-## Notes
+## Production (Supabase)
 
-- Sidebar links for organism categories are scaffolded in the UI.
-- Only the home route (`/`) is currently implemented with full content.
+To use Supabase as the hosted data layer, apply the schema in [`docs/supabase/microbes.sql`](docs/supabase/microbes.sql) to your Supabase project, then add the `NEXT_PUBLIC_SUPABASE_*` keys to your frontend env.
+
+## Docs
+
+Planning documents live in [`docs/plans/`](docs/plans/):
+
+- [`01-topbar-branding.md`](docs/plans/01-topbar-branding.md) — branding and topbar design
+- [`02-monorepo-deployment.md`](docs/plans/02-monorepo-deployment.md) — monorepo and deployment strategy
+- [`03-supabase-data-layer.md`](docs/plans/03-supabase-data-layer.md) — Supabase integration
+- [`zoa_backend_and_microbe_pages_21d64019.plan.md`](docs/plans/zoa_backend_and_microbe_pages_21d64019.plan.md) — backend and microbe pages plan

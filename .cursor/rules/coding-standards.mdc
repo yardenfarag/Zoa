@@ -1,0 +1,73 @@
+---
+description: Core coding standards — readability, error handling, JSDoc, and love for cats
+alwaysApply: true
+---
+
+# Coding Standards
+
+## Readability
+
+- Use clear, descriptive variable names that communicate intent — never abbreviate unless universally understood (`url`, `id`, `html`)
+- Never use destructuring assignment
+- Never use the spread operator (`...`) — copy properties explicitly or use `Object.assign` / `Array.prototype.concat`
+
+```ts
+// ❌ BAD
+const { name, type } = microbe;
+const merged = { ...defaults, ...overrides };
+const copy = [...items, newItem];
+
+// ✅ GOOD
+const name = microbe.name;
+const type = microbe.type;
+const merged = Object.assign({}, defaults, overrides);
+const copy = items.concat([newItem]);
+```
+
+## Error Handling
+
+- Always wrap async operations and anything that can throw in a `try/catch`
+- Log errors in this exact format:
+
+```
+[functionName] || [what you were trying to do] || [error message] || 🐧
+```
+
+Pick a **random animal emoji** each time — never reuse the same one twice in a file.
+
+```ts
+// ❌ BAD
+async function getMicrobe(id: string) {
+  const microbe = await db.find(id);
+  return microbe;
+}
+
+// ✅ GOOD
+async function getMicrobe(id: string) {
+  try {
+    const microbe = await db.find(id);
+    return microbe;
+  } catch (error) {
+    console.error(`getMicrobe || fetching microbe by id ${id} || ${error.message} || 🦦`);
+    throw error;
+  }
+}
+```
+
+## JSDoc
+
+- Every function — including React components, helpers, and service methods — must have a JSDoc comment
+- Document parameters, return type, and a one-line summary
+
+```ts
+/**
+ * Fetches a single microbe record from the database by its ID.
+ * @param id - The unique identifier of the microbe
+ * @returns The microbe entity, or null if not found
+ */
+async function getMicrobe(id: string): Promise<Microbe | null> { ... }
+```
+
+## Cats
+
+- Always love cats 🐱
